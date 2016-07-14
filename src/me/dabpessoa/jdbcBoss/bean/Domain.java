@@ -1,4 +1,4 @@
-package me.dabpessoa.bean;
+package me.dabpessoa.jdbcBoss.bean;
 
 import java.io.Serializable;
 

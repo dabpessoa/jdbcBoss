@@ -1,10 +1,10 @@
-package me.dabpessoa.jdbc;
+package me.dabpessoa.jdbcBoss.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-import me.dabpessoa.bean.Domain;
+import me.dabpessoa.jdbcBoss.bean.Domain;
 
 
 public class Run {

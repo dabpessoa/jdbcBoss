@@ -1,4 +1,4 @@
-package me.dabpessoa.jdbc;
+package me.dabpessoa.jdbcBoss.jdbc;
 
 public class ConnectionProperties {
 

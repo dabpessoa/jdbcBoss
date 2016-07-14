@@ -1,5 +1,4 @@
-package temp;
-
+package me.dabpessoa.jdbcBoss.temp;
 /**
  * 
  * Classe utilizada para transformações no momento de inserir um objeto.

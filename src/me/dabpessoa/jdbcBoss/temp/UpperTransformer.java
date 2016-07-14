@@ -1,4 +1,4 @@
-package temp;
+package me.dabpessoa.jdbcBoss.temp;
 
 public class UpperTransformer implements FieldTransformer, ValueTransformer {
 

@@ -1,4 +1,4 @@
-package temp;
+package me.dabpessoa.jdbcBoss.temp;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;

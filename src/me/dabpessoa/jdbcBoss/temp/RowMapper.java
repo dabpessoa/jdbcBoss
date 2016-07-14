@@ -1,4 +1,4 @@
-package temp;
+package me.dabpessoa.jdbcBoss.temp;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;

@@ -1,4 +1,4 @@
-package temp;
+package me.dabpessoa.jdbcBoss.temp;
 
 public class JdbcEmptyVersionException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
