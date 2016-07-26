@@ -1,10 +1,13 @@
-package me.dabpessoa.jdbcBoss.jdbc;
+package me.dabpessoa.jdbcBoss.run;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 import me.dabpessoa.jdbcBoss.bean.Domain;
+import me.dabpessoa.jdbcBoss.jdbc.ConnectionProperties;
+import me.dabpessoa.jdbcBoss.jdbc.JDBCBoss;
+import me.dabpessoa.jdbcBoss.jdbc.ResultSetObjectMapper;
 
 
 public class Run {
