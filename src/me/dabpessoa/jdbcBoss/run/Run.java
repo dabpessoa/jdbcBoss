@@ -22,8 +22,8 @@ public class Run {
 		
 		JDBCBoss jdbcBoss = new JDBCBoss(connectionProperties);
 		
-		int result = jdbcBoss.insert("insert into vaicomecar.domain values (default, 'description teste', 'label teste')");
-		System.out.println(result);
+//		int result = jdbcBoss.insert("insert into vaicomecar.domain values (default, 'description teste', 'label teste')");
+//		System.out.println(result);
 		
 		List<Domain> domains = jdbcBoss.queryList("select * from vaicomecar.domain", new ResultSetObjectMapper<Domain>() {
 			public Domain map(ResultSet rs, int rowNum) throws SQLException {
