@@ -51,6 +51,22 @@ public class JDBCBoss implements JDBCQuerable {
 		return (T) queryAnyObject(sql, mapper, false);
 	}
 	
+	/**
+	 * INSERT, UPDATE and DELETE
+	 * @param sql
+	 * @return
+	 */
+	@Override
+	public int execute(String sql) {
+		return manager.execute(new ConnectionExecuteCallback<Integer>() {
+			@Override
+			public Integer execute(Connection connection) throws SQLException {
+				PreparedStatement pstm = connection.prepareStatement(sql);
+				return pstm.executeUpdate();
+			}
+		});
+	}
+	
 	private <T> Object queryAnyObject(String sql, ResultSetObjectMapper<T> mapper, boolean isQueryList) {
 		return manager.execute(new ConnectionExecuteCallback<Object>() {
 			@Override
@@ -72,31 +88,9 @@ public class JDBCBoss implements JDBCQuerable {
 		});
 	}
 	
-	@Override
-	public int insert(String sql) {
-		return executeAction(sql);
-	}
-	
-	@Override
-	public int update(String sql) {
-		return executeAction(sql);
-	}
-	
-	@Override
-	public int delete(String sql) {
-		return executeAction(sql);
-	}
-	
-	private int executeAction(String sql) {
-		return manager.execute(new ConnectionExecuteCallback<Integer>() {
-			@Override
-			public Integer execute(Connection connection) throws SQLException {
-				PreparedStatement pstm = connection.prepareStatement(sql);
-				return pstm.executeUpdate();
-			}
-		});
-	}
-	
+	/*
+	 * wantedFieldsMap => Mapa dos nomes dos atributos das entidades e seus respectivos nomes no banco de dados.
+	 */
 	private <T> ResultSetObjectMapper<T> createGenericResultSetObjectMapper(Class<T> clazz, Map<String, String> wantedFieldsMap) {
 		
 		ResultSetObjectMapper<T> mapper = new ResultSetObjectMapper<T>() {

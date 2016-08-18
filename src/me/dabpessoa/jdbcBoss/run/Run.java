@@ -22,7 +22,7 @@ public class Run {
 		
 		JDBCBoss jdbcBoss = new JDBCBoss(connectionProperties);
 		
-//		int result = jdbcBoss.insert("insert into vaicomecar.domain values (default, 'description teste', 'label teste')");
+//		int result = jdbcBoss.execute("insert into vaicomecar.domain values (default, 'description teste', 'label teste')");
 //		System.out.println(result);
 		
 		List<Domain> domains = jdbcBoss.queryList("select * from vaicomecar.domain", new ResultSetObjectMapper<Domain>() {
