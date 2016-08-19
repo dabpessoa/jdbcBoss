@@ -27,6 +27,10 @@ public interface JDBCQuerable {
 	 */
 	<T> T querySingleResult(String sql, Class<T> clazz, Map<String, String> wantedFieldsMap);
 	
+	<T> T querySingleObject(String sql);
+	
+	<T> List<T> queryObjectList(String sql);
+	
 	int execute(String sql);
 	
 }

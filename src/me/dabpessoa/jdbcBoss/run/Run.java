@@ -35,6 +35,11 @@ public class Run {
 			};
 		});
 		
+		System.out.println("(*) TESTE DOMAIN LIST");
+		for (Domain d : domains) {
+			System.out.println("Domain: "+d.getLabel());
+		}
+		
 		Domain domain = jdbcBoss.querySingleResult("select * from vaicomecar.domain m where m.id = 2", new ResultSetObjectMapper<Domain>() {
 			@Override
 			public Domain map(ResultSet rs, int rowNum) throws SQLException {
@@ -46,10 +51,17 @@ public class Run {
 			}
 		});
 		
-		System.out.println("DOMAIN unique result: "+domain.getLabel());
+		System.out.println("(*) TESTE DOMAIN UNIQUE RESULT");
+		System.out.println("Domain: "+domain.getLabel());
 		
-		for (Domain d : domains) {
-			System.out.println("DOMAIN: "+d.getLabel());
+		String domainDescription = jdbcBoss.querySingleObject("select d.description from vaicomecar.domain d where d.id = 1");
+		System.out.println("(*) TESTE SINGLE OBJECT");
+		System.out.println("Description: "+domainDescription);
+		
+		List<String> domainDescriptions = jdbcBoss.queryObjectList("select d.description from vaicomecar.domain d");
+		System.out.println("(*) TESTE MULTIPLE OBJECTS");
+		for (String description : domainDescriptions) {
+			System.out.println("Description: "+description);
 		}
 		
 	}

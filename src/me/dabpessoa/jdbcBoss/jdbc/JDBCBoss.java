@@ -51,6 +51,18 @@ public class JDBCBoss implements JDBCQuerable {
 		return (T) queryAnyObject(sql, mapper, false);
 	}
 	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T querySingleObject(String sql) {
+		return (T) queryAnyObject(sql, null, false);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> List<T> queryObjectList(String sql) {
+		return (List<T>) queryAnyObject(sql, null, true);
+	}
+	
 	/**
 	 * INSERT, UPDATE and DELETE
 	 * @param sql
@@ -70,17 +82,24 @@ public class JDBCBoss implements JDBCQuerable {
 	private <T> Object queryAnyObject(String sql, ResultSetObjectMapper<T> mapper, boolean isQueryList) {
 		return manager.execute(new ConnectionExecuteCallback<Object>() {
 			@Override
+			@SuppressWarnings("unchecked")
 			public Object execute(Connection connection) throws SQLException {
 				Statement stm = connection.createStatement();
 				ResultSet rs = stm.executeQuery(sql);
 				if (!isQueryList) {
 					rs.next();
-					return mapper.map(rs, 1);
+					if (mapper != null) return mapper.map(rs, 1);
+					else {
+						return rs.getObject(1);
+					}
 				} else {
 					List<T> list = new ArrayList<T>();
 					int rowCount = 0;
 					while (rs.next()) {
-						list.add(mapper.map(rs, ++rowCount));
+						if (mapper != null) list.add(mapper.map(rs, ++rowCount));
+						else {							
+							list.add((T) rs.getObject(1));
+						}
 					}
 					return list;
 				}
