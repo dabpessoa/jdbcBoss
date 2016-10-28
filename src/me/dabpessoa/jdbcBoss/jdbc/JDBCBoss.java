@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import me.dabpessoa.jdbcBoss.temp.GenericRowMapperFactory;
+import me.dabpessoa.jdbcBoss.util.QueryGenerator;
 import me.dabpessoa.jdbcBoss.util.ReflectionUtils;
 
 public class JDBCBoss implements JDBCQuerable {
@@ -25,17 +25,8 @@ public class JDBCBoss implements JDBCQuerable {
 		manager = new ConnectionManager(connectionProperties);
 	}
 	
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> List<T> queryList(String sql, ResultSetObjectMapper<T> mapper) {
-		return (List<T>) queryAnyObject(sql, mapper, true);
-	}
-	
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> List<T> queryList(String sql, Class<T> clazz, Map<String, String> wantedFieldsMap) {
-		ResultSetObjectMapper<T> mapper = createGenericResultSetObjectMapper(clazz, wantedFieldsMap);
-		return (List<T>) queryAnyObject(sql, mapper, true);
+	public JDBCBoss(String user, String password, String url, String jdbcDriverClassFullName) {
+		this(new ConnectionProperties(user, password, url, jdbcDriverClassFullName));
 	}
 	
 	@Override
@@ -46,8 +37,8 @@ public class JDBCBoss implements JDBCQuerable {
 	
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> T querySingleResult(String sql, Class<T> clazz, Map<String, String> wantedFieldsMap) {
-		ResultSetObjectMapper<T> mapper = createGenericResultSetObjectMapper(clazz, wantedFieldsMap);
+	public <T> T querySingleResult(String sql, Class<T> clazz, Map<String, Object> selectFieldsMap) {
+		ResultSetObjectMapper<T> mapper = createGenericResultSetObjectMapper(clazz, selectFieldsMap);
 		return (T) queryAnyObject(sql, mapper, false);
 	}
 	
@@ -58,9 +49,44 @@ public class JDBCBoss implements JDBCQuerable {
 	}
 	
 	@Override
+	public long count(String tableName) {
+		return count(tableName, null);
+	}
+	
+	@Override
+	public long count(String tableName, Map<String, Object> whereFieldsMap) {
+		String sql = QueryGenerator.generateQuery(tableName, null, whereFieldsMap, QueryGenerator.EXECUTE_COUNT);
+		return querySingleObject(sql);
+	}
+	
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> List<T> queryObjectList(String sql) {
 		return (List<T>) queryAnyObject(sql, null, true);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> List<T> queryList(String sql, ResultSetObjectMapper<T> mapper) {
+		return (List<T>) queryAnyObject(sql, mapper, true);
+	}
+	
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> List<T> queryList(String sql, Class<T> clazz, Map<String, Object> selectFieldsMap) {
+		ResultSetObjectMapper<T> mapper = createGenericResultSetObjectMapper(clazz, selectFieldsMap);
+		return (List<T>) queryAnyObject(sql, mapper, true);
+	}
+	
+	@Override
+	public <T> List<T> queryList(Class<T> clazz, String tableName, Map<String, Object> selectFieldsMap) {
+		return queryList(clazz, tableName, selectFieldsMap, null);
+	}
+	
+	@Override
+	public <T> List<T> queryList(Class<T> clazz, String tableName, Map<String, Object> selectFieldsMap, Map<String, Object> whereFieldsMap) {
+		String sql = QueryGenerator.generateQuery(tableName, selectFieldsMap, whereFieldsMap, QueryGenerator.EXECUTE_QUERY);
+		return queryList(sql, createGenericResultSetObjectMapper(clazz, selectFieldsMap));
 	}
 	
 	/**
@@ -70,7 +96,7 @@ public class JDBCBoss implements JDBCQuerable {
 	 */
 	@Override
 	public int execute(String sql) {
-		return manager.execute(new ConnectionExecuteCallback<Integer>() {
+		return manager.execute(new ConnectionCallback<Integer>() {
 			@Override
 			public Integer execute(Connection connection) throws SQLException {
 				PreparedStatement pstm = connection.prepareStatement(sql);
@@ -80,7 +106,7 @@ public class JDBCBoss implements JDBCQuerable {
 	}
 	
 	private <T> Object queryAnyObject(String sql, ResultSetObjectMapper<T> mapper, boolean isQueryList) {
-		return manager.execute(new ConnectionExecuteCallback<Object>() {
+		return manager.execute(new ConnectionCallback<Object>() {
 			@Override
 			@SuppressWarnings("unchecked")
 			public Object execute(Connection connection) throws SQLException {
@@ -108,9 +134,9 @@ public class JDBCBoss implements JDBCQuerable {
 	}
 	
 	/*
-	 * wantedFieldsMap => Mapa dos nomes dos atributos das entidades e seus respectivos nomes no banco de dados.
+	 * selectFieldsMap => Mapa dos nomes dos atributos das entidades e seus respectivos nomes no banco de dados.
 	 */
-	private <T> ResultSetObjectMapper<T> createGenericResultSetObjectMapper(Class<T> clazz, Map<String, String> wantedFieldsMap) {
+	private <T> ResultSetObjectMapper<T> createGenericResultSetObjectMapper(Class<T> clazz, Map<String, Object> selectFieldsMap) {
 		
 		ResultSetObjectMapper<T> mapper = new ResultSetObjectMapper<T>() {
 			@Override
@@ -125,9 +151,9 @@ public class JDBCBoss implements JDBCQuerable {
 					e.printStackTrace();
 				}
 				
-				for (Entry<String, String> entry : wantedFieldsMap.entrySet()) {
+				for (Entry<String, Object> entry : selectFieldsMap.entrySet()) {
 					String entityFieldName = entry.getKey(); // Entity field name
-					String databaseColumnName = entry.getValue(); // Database column name
+					String databaseColumnName = entry.getValue().toString(); // Database column name
 				
 					Field field = ReflectionUtils.findFieldByName(clazz, entityFieldName);
 					
@@ -135,7 +161,7 @@ public class JDBCBoss implements JDBCQuerable {
 					try {
 						fieldValue = rs.getObject(databaseColumnName);
 					} catch (SQLException e) {
-						throw new SQLException("Erro ao setar valor no RowMapper. ("+GenericRowMapperFactory.class.getSimpleName()+"). Field Name = "+field.getName()+", Field Type = "+field.getType(), e);
+						throw new SQLException("Erro ao setar valor no ResultSetObjectMapper. ("+ResultSetObjectMapper.class.getSimpleName()+"). Field Name = "+field.getName()+", Field Type = "+field.getType(), e);
 					}
 					
 					try {

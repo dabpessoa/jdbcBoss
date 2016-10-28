@@ -13,7 +13,7 @@ public class ConnectionManager {
 		jdbcConnection = new JDBCConnection();
 	}
 	
-	public <T> T execute(ConnectionExecuteCallback<T> callback) {
+	public <T> T execute(ConnectionCallback<T> callback) {
 		Connection connection = null;
 		try {
 			

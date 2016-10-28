@@ -8,6 +8,7 @@ import me.dabpessoa.jdbcBoss.bean.Domain;
 import me.dabpessoa.jdbcBoss.jdbc.ConnectionProperties;
 import me.dabpessoa.jdbcBoss.jdbc.JDBCBoss;
 import me.dabpessoa.jdbcBoss.jdbc.ResultSetObjectMapper;
+import me.dabpessoa.jdbcBoss.util.MapFactory;
 
 
 public class Run {
@@ -25,15 +26,23 @@ public class Run {
 //		int result = jdbcBoss.execute("insert into vaicomecar.domain values (default, 'description teste', 'label teste')");
 //		System.out.println(result);
 		
-		List<Domain> domains = jdbcBoss.queryList("select * from vaicomecar.domain", new ResultSetObjectMapper<Domain>() {
-			public Domain map(ResultSet rs, int rowNum) throws SQLException {
-				Domain domain = new Domain();
-				domain.setId(rs.getLong("id"));
-				domain.setLabel(rs.getString("label"));
-				domain.setDescription(rs.getString("description"));
-				return domain;
-			};
-		});
+		List<Domain> domains = jdbcBoss.queryList("select * from vaicomecar.domain", Domain.class, MapFactory.create("id", "id", "label", "label", "description", "description"));
+		
+		long count = jdbcBoss.count("vaicomecar.domain");
+		System.out.println(count);
+		
+		long countWhere = jdbcBoss.count("vaicomecar.domain", MapFactory.create("id", 1));
+		System.out.println(countWhere);
+		
+//		List<Domain> domains = jdbcBoss.queryList("select * from vaicomecar.domain", new ResultSetObjectMapper<Domain>() {
+//			public Domain map(ResultSet rs, int rowNum) throws SQLException {
+//				Domain domain = new Domain();
+//				domain.setId(rs.getLong("id"));
+//				domain.setLabel(rs.getString("label"));
+//				domain.setDescription(rs.getString("description"));
+//				return domain;
+//			};
+//		});
 		
 		System.out.println("(*) TESTE DOMAIN LIST");
 		for (Domain d : domains) {
