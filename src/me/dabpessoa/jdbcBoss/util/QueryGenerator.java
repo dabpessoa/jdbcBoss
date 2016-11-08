@@ -1,5 +1,6 @@
 package me.dabpessoa.jdbcBoss.util;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 public class QueryGenerator {
@@ -33,7 +34,34 @@ public class QueryGenerator {
 		
 			case EXECUTE_QUERY: {
 				
-				// TODO FIXME implementar
+				sql = new StringBuffer("select ");
+				
+				if (fieldsMap != null && !fieldsMap.isEmpty()) {
+					ArrayList<Object> dataBaseFieldsName = new ArrayList<Object>(fieldsMap.values());
+					if (dataBaseFieldsName != null) {
+						for(int i = 0 ; i < dataBaseFieldsName.size() ; i++) {
+							String dataBaseFieldName = null;
+							if (dataBaseFieldsName.get(i) != null) {
+								dataBaseFieldName = dataBaseFieldsName.get(i).toString();
+							}
+							if (i+1 != dataBaseFieldsName.size()) sql.append(dataBaseFieldName+", ");
+							else sql.append(dataBaseFieldName);
+						}
+					}
+				} else {
+					sql.append(" * ");
+				}
+				
+				sql.append(" from "+tableName);
+				
+				if (whereFieldsMap != null) {
+					String[] wherekeys = whereFieldsMap.keySet().toArray(new String[whereFieldsMap.keySet().size()]);
+					sql.append(" where ");
+					for(int i = 0 ; i < wherekeys.length ; i++) {
+						if (i+1 != wherekeys.length) sql.append(wherekeys[i]+"="+whereFieldsMap.get(wherekeys[i])+" and ");
+						else sql.append(wherekeys[i]+"="+whereFieldsMap.get(wherekeys[i]));
+					}
+				}
 				
 				break;
 			}

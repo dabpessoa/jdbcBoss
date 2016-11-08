@@ -44,6 +44,8 @@ public class Run {
 //			};
 //		});
 		
+		domains = jdbcBoss.queryList(Domain.class, "vaicomecar.domain", MapFactory.create("id", "id", "label", "label"), MapFactory.create("id", 3));
+		
 		System.out.println("(*) TESTE DOMAIN LIST");
 		for (Domain d : domains) {
 			System.out.println("Domain: "+d.getLabel());
